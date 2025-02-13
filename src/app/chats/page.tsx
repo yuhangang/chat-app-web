@@ -1,35 +1,34 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Link, Loader2, Menu, SendIcon, Sparkles, X } from "lucide-react";
-import { cookieService } from "@/lib/cookies";
-import { ChatRoom } from "@/types";
-import { Button } from "@/components/ui/button";
+import { Loader2, SendIcon, Sparkles } from "lucide-react";
+import React, { useState } from "react";
 import { useChatRoomsContext } from "./hooks/useChatRoomsContext";
+import { useNewChat } from "./hooks/useNewChat";
+import ChatInput from "./components/ChatInput";
 
 export default function ChatsPage() {
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { createChatRoom } = useChatRoomsContext();
-
   const suggestions = [
     { text: "Help me write a blog post about AI", icon: "✍️" },
     { text: "Explain quantum computing to a beginner", icon: "🔬" },
   ];
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const {
+    newMessage,
+    isSending,
+    selectedFile,
+    sendMessage,
+    setNewMessage,
+    setSelectedFile,
+  } = useNewChat();
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
-    setIsLoading(true);
-    createChatRoom(message);
-    setTimeout(() => setIsLoading(false), 8000);
+    if (!newMessage.trim()) return;
+    sendMessage(newMessage);
   };
 
   const handleSuggestionClick = (suggestion: string) => {
-    setIsLoading(true);
-
-    createChatRoom(suggestion);
-    setTimeout(() => setIsLoading(false), 8000);
+    sendMessage(suggestion);
   };
 
   return (
@@ -41,27 +40,14 @@ export default function ChatsPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="relative">
-        <Input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Send a message..."
-          className="w-full p-4 pr-12 rounded-lg shadow-md border focus:ring-2 focus:ring-blue-500 transition-all"
-          disabled={isLoading}
-        />
-        <button
-          className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full
-            ${message.trim() ? "bg-blue-500 text-white" : "text-gray-400"}
-            transition-all hover:bg-blue-600 disabled:opacity-50`}
-          disabled={!message.trim() || isLoading}
-        >
-          {isLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <SendIcon className="h-5 w-5" />
-          )}
-        </button>
-      </form>
+      <ChatInput
+        newMessage={newMessage}
+        isSending={isSending}
+        selectedFile={selectedFile}
+        setNewMessage={setNewMessage}
+        handleSubmit={handleSubmit}
+        setSelectedFile={setSelectedFile}
+      />
 
       <div className="mt-8 space-y-2">
         {suggestions.map((suggestion, i) => (
@@ -78,7 +64,7 @@ export default function ChatsPage() {
         ))}
       </div>
 
-      {isLoading && (
+      {isSending && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
           <div className="bg-white p-6 rounded-xl shadow-xl flex items-center gap-4 animate-in fade-in duration-300">
             <Sparkles className="h-5 w-5 text-blue-500 animate-pulse" />

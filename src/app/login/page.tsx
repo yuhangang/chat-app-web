@@ -8,8 +8,6 @@ import { useLogin } from "./hooks/useLogin";
 export default function LoginPage() {
   const { username, error, setUsername, handleSubmit } = useLogin();
 
-  const router = useRouter();
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
       <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">

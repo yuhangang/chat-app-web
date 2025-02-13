@@ -18,6 +18,8 @@ export default function ChatInput({
   handleSubmit,
   setNewMessage,
   setSelectedFile,
+  previewPosition = "above",
+  previewMaxHeight = "12rem",
 }: {
   isSending: boolean;
   newMessage: string;
@@ -25,37 +27,36 @@ export default function ChatInput({
   handleSubmit: (e: React.FormEvent, attachment?: File) => void;
   setNewMessage: (message: string) => void;
   setSelectedFile: (file: File | null) => void;
+  previewPosition?: "above" | "below";
+  previewMaxHeight?: string;
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragCounterRef = useRef(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     handleFile(file);
   };
 
   const handleFile = (file: File) => {
-    // Check if file size exceeds 10MB
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 10MB
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
     if (file.size > MAX_FILE_SIZE) {
       alert("File size exceeds 5MB. Please select a smaller file.");
       return;
     }
 
-    // Check if file type is allowed
-    const fileType = file.type;
-    if (!Object.keys(ALLOWED_FILE_TYPES).includes(fileType)) {
+    if (!Object.keys(ALLOWED_FILE_TYPES).includes(file.type)) {
       alert("File type not supported. Please select a valid file.");
       return;
     }
 
     setSelectedFile(file);
 
-    // Create preview for images
-    if (fileType.startsWith("image/")) {
+    if (file.type.startsWith("image/")) {
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
     }
@@ -64,14 +65,17 @@ export default function ChatInput({
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    dragCounterRef.current++;
     setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
-    setIsDragging(false);
+    dragCounterRef.current--;
+    if (dragCounterRef.current === 0) {
+      setIsDragging(false);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -82,6 +86,7 @@ export default function ChatInput({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    dragCounterRef.current = 0;
     setIsDragging(false);
 
     const file = e.dataTransfer.files[0];
@@ -91,6 +96,7 @@ export default function ChatInput({
 
   const removeAttachment = () => {
     setSelectedFile(null);
+    setPreviewUrl(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -101,85 +107,109 @@ export default function ChatInput({
     removeAttachment();
   };
 
-  return (
-    <div
-      className="p-4 border-t relative"
-      onDragEnter={handleDragEnter}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      {isDragging && (
-        <div className="absolute inset-2 border-2 border-dashed border-blue-500 bg-blue-50 rounded-lg flex items-center justify-center">
-          <div className="text-blue-500 text-sm">Drop file here</div>
-        </div>
-      )}
+  const adjustTextareaHeight = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = "auto";
+    const newHeight = Math.min(textarea.scrollHeight, 5 * 24); // 24px per line, max 5 lines
+    textarea.style.height = `${newHeight}px`;
+  };
 
-      {selectedFile && (
-        <div className="absolute bottom-full right-4 mb-2">
-          <div className="relative inline-flex items-center bg-white rounded-lg shadow-sm border p-1">
-            <button
-              onClick={removeAttachment}
-              className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border hover:bg-gray-50"
-              type="button"
-            >
-              <X className="w-3 h-3" />
-            </button>
-            <div className="flex items-center gap-2">
-              {previewUrl ? (
-                <div className="bg-gray-100 rounded flex items-center justify-center">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="w-48 h-48  object-cover rounded"
-                  />
-                </div>
-              ) : (
-                <div className="w-6 h-6 bg-gray-100 rounded flex items-center justify-center text-xs">
-                  {selectedFile.name.split(".").pop()?.toUpperCase()}
-                </div>
-              )}
-              <span className="text-xs truncate max-w-[140px]">
-                {selectedFile.name}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewMessage(e.target.value);
+    adjustTextareaHeight(e.target);
+  };
 
-      <form onSubmit={handleFormSubmit} className="flex gap-2">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className={`flex-1 p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            isSending ? "bg-gray-100 text-gray-500" : ""
-          }`}
-          placeholder="Type your message..."
-          disabled={isSending}
-        />
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileSelect}
-          accept={Object.values(ALLOWED_FILE_TYPES).join(",")}
-          className="hidden"
-        />
+  const FilePreview = () => (
+    <div className="w-full bg-gray-50 rounded-lg border">
+      <div className="relative p-2">
         <button
+          onClick={removeAttachment}
+          className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-sm border hover:bg-gray-50 z-10"
           type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="p-3 rounded-lg border hover:bg-gray-50 transition-colors"
-          disabled={isSending}
         >
-          <Paperclip className="w-5 h-5 text-gray-500" />
+          <X className="w-4 h-4" />
         </button>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-colors"
-          disabled={!newMessage.trim() && !selectedFile}
-        >
-          <Send className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-3">
+          {previewUrl ? (
+            <div className="h-12 w-12 bg-gray-100 rounded flex-shrink-0">
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="h-full w-full object-cover rounded"
+              />
+            </div>
+          ) : (
+            <div className="h-12 w-12 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center text-sm font-medium">
+              {selectedFile?.name.split(".").pop()?.toUpperCase()}
+            </div>
+          )}
+          <span className="text-sm truncate flex-1">{selectedFile?.name}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="p-4 border-t">
+      <form onSubmit={handleFormSubmit} className="flex flex-col gap-2">
+        {selectedFile && previewPosition === "above" && <FilePreview />}
+
+        <div className="flex gap-2">
+          <div
+            className="flex-1 relative"
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <textarea
+              ref={textareaRef}
+              value={newMessage}
+              onChange={handleTextareaChange}
+              className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[48px] transition-opacity duration-200 ${
+                isSending ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              placeholder="Type your message..."
+              disabled={isSending}
+              rows={1}
+            />
+            {isDragging && (
+              <div className="absolute -inset-2 border-2 border-dashed border-blue-500 bg-blue-50/80 rounded-xl flex items-center justify-center">
+                <div className="text-blue-500 text-lg font-medium">
+                  Drop file here
+                </div>
+              </div>
+            )}
+          </div>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept={Object.values(ALLOWED_FILE_TYPES).join(",")}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={`w-12 h-12 flex items-center justify-center rounded-lg border hover:bg-gray-50 transition-all duration-200 ${
+              isSending ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isSending}
+          >
+            <Paperclip className="w-5 h-5 text-gray-500" />
+          </button>
+          <button
+            type="submit"
+            className={`w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 ${
+              isSending ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isSending}
+          >
+            <Send className={`w-5 h-5 ${isSending ? "animate-pulse" : ""}`} />
+          </button>
+        </div>
+
+        {selectedFile && previewPosition === "below" && <FilePreview />}
       </form>
     </div>
   );

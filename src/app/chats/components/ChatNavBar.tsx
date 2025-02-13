@@ -54,7 +54,6 @@ export function ChatNavBar({ isOpen }: { isOpen: boolean }) {
         </div>
         <div className="space-y-2 flex flex-col overflow-y-auto h-[calc(100vh-200px)]">
           {chatRooms.map((room, i: number) => {
-            console.log("Room:", room);
             return (
               <ChatRoomItem
                 key={i}

@@ -4,7 +4,6 @@ import Cookies from "js-cookie";
 export const cookieService = {
   // Set a cookie
   set: (name: string, value: string, options?: Cookies.CookieAttributes) => {
-    console.log("Setting cookie", name, value, options);
     Cookies.set(name, value, {
       // Default options
       path: "/",
@@ -35,8 +34,16 @@ export const cookieService = {
 // Specific token-related cookie helpers
 export const authCookieService = {
   // Set auth token
-  setToken: (token: string) => {
-    cookieService.set("token", token, {
+  setAccessToken: (token: string) => {
+    cookieService.set("accessToken", token, {
+      // Optional: set expiration, secure, etc.
+      expires: 7, // expires in 7 days
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+  },
+  setRefreshToken: (token: string) => {
+    cookieService.set("refreshToken", token, {
       // Optional: set expiration, secure, etc.
       expires: 7, // expires in 7 days
       secure: process.env.NODE_ENV === "production",
@@ -44,18 +51,21 @@ export const authCookieService = {
     });
   },
 
-  // Get auth token
-  getToken: () => {
-    return cookieService.get("token");
+  getAccessToken: () => {
+    return cookieService.get("accessToken");
+  },
+  getRefreshToken: () => {
+    return cookieService.get("refreshToken");
   },
 
   // Remove auth token
   removeToken: () => {
-    cookieService.remove("token");
+    cookieService.remove("accessToken");
+    cookieService.remove("refreshToken");
   },
 
   // Check if user is authenticated
   isAuthenticated: () => {
-    return !!cookieService.get("token");
+    return cookieService.has("accessToken");
   },
 };

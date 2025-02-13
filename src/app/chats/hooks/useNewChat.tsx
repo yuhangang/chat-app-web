@@ -11,17 +11,15 @@ export const useNewChat = () => {
   const router = useRouter();
   const { addChatRoom } = useChatRoomsContext();
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const sendMessage = async (message: string) => {
     setIsSending(true);
 
     try {
-      const jwt = cookieService.get("token");
+      const jwt = cookieService.get("accessToken");
 
       const formData = new FormData();
 
-      formData.append("prompt", newMessage);
+      formData.append("prompt", message);
       if (selectedFile) {
         formData.append("attachment", selectedFile);
       }
@@ -39,7 +37,7 @@ export const useNewChat = () => {
         addChatRoom(data);
 
         // redirect to the chat room
-        router.replace(`/chats/${data.id}`);
+        router.push(`/chats/${data.id}`);
       }
     } catch (error) {
       console.error("Failed to send message:", error);

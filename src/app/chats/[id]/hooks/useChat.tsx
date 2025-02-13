@@ -23,7 +23,7 @@ const useChat = (id: string) => {
     setIsSending(true);
     try {
       let res;
-      const jwt = cookieService.get("token");
+      const jwt = cookieService.get("accessToken");
 
       const formData = new FormData();
 
@@ -56,7 +56,7 @@ const useChat = (id: string) => {
   };
 
   const fetchChatroom = useCallback(async () => {
-    const jwt = cookieService.get("token");
+    const jwt = cookieService.get("accessToken");
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats/${id}`,
       {
@@ -66,7 +66,6 @@ const useChat = (id: string) => {
     if (res.ok) {
       const data: ChatRoom = await res.json();
       setChatRoom(data);
-      console.log("Chat messages:", data.chat_messages);
       if (data.chat_messages) {
         setMessages(data.chat_messages);
       }

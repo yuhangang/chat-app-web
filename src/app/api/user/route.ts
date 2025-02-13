@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     let cookiesInstance = await cookies();
 
     // Set the JWT from backend response
-    await cookiesInstance.set("token", userData.access_token, {
+    await cookiesInstance.set("accessToken", userData.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

@@ -7,7 +7,7 @@ const JWT_SECRET = new TextEncoder().encode(
 
 export async function verifyAuth() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token");
+  const token = cookieStore.get("accessToken");
 
   if (!token) {
     throw new Error("Unauthorized");

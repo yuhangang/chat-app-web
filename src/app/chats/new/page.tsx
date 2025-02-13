@@ -23,7 +23,7 @@ export default function ChatRoomPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
-    sendMessage(e);
+    sendMessage(newMessage);
   };
 
   return (

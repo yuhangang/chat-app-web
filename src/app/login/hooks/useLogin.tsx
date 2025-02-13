@@ -1,10 +1,16 @@
-import { cookieService } from "@/lib/cookies";
-import router from "next/router";
+import { authCookieService } from "@/lib/cookies";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+type AuthResponse = {
+  access_token: string;
+  refresh_token: string;
+};
 
 export const useLogin = () => {
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,30 +19,23 @@ export const useLogin = () => {
     try {
       // api end point from env API_ENDPOINT
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/user`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username }),
       });
 
-      const data = await res.json();
-      const accessToken = data?.access_token;
+      const data: AuthResponse | null = await res.json();
 
-      cookieService.set("token", accessToken, {
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        expires: 7,
-      });
-
-      if (accessToken) {
-        document.cookie = `token=${accessToken}; path=/`;
-        // Save token to cookie
+      if (data) {
+        authCookieService.setAccessToken(data.access_token);
+        authCookieService.setRefreshToken(data.refresh_token);
       }
 
       if (res.ok) {
-        //router.push("/");
+        router.replace("/chats");
       } else {
-        setError(data.error || "Login failed");
+        setError("Login failed");
       }
     } catch (error) {
       console.error(error);
