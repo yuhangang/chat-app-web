@@ -39,3 +39,9 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+export type RequestError = {
+  message: string;
+  code: number;
+  type: string;
+};

@@ -1,24 +1,25 @@
-import {
-  useState,
-  useCallback,
-  useEffect,
-  createContext,
-  useContext,
-} from "react";
+import authFetch from "@/lib/fetch/fetch";
 import { ChatRoom } from "@/types";
-import { cookieService } from "@/lib/cookies";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 const useChatRooms = () => {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const fetchChatRooms = useCallback(async () => {
     try {
-      const jwt = cookieService.get("accessToken");
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats`, {
-        headers: { Authorization: `Bearer ${jwt}` },
-      });
+      const res = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats`
+      );
       if (res.ok) {
         const data = await res.json();
         setChatRooms(data);
@@ -37,16 +38,23 @@ const useChatRooms = () => {
   const deleteChatRoom = useCallback(
     async (id: number) => {
       try {
-        const jwt = cookieService.get("accessToken");
-        const res = await fetch(
+        const res = await authFetch(
           `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats/${id}`,
           {
             method: "DELETE",
-            headers: { Authorization: `Bearer ${jwt}` },
           }
         );
         if (res.ok) {
           await setChatRooms((prev) => prev.filter((room) => room.id !== id));
+
+          // TODO: Fix this
+          if (pathname === `/chats/${id}`) {
+            router.replace("/chats/new");
+            router.refresh();
+          }
+
+          // redirect to /chats/new if the current chat room is deleted
+
           return true;
         }
         return false;
@@ -55,7 +63,7 @@ const useChatRooms = () => {
         return false;
       }
     },
-    [fetchChatRooms]
+    [fetchChatRooms, usePathname]
   );
 
   return {

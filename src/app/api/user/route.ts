@@ -7,13 +7,16 @@ export async function POST(req: Request) {
     const { username } = body;
 
     // This will now expect the backend to provide the full response, including JWT
-    const backendResponse = await fetch("http://localhost:3001", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username }),
-    });
+    const backendResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username }),
+      }
+    );
 
     if (!backendResponse.ok) {
       return NextResponse.json(

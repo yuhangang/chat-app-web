@@ -1,8 +1,10 @@
-import { cookieService } from "@/lib/cookies";
+import { getErrorType, RequestError, RequestErrors } from "@/lib/error";
+import authFetch from "@/lib/fetch/fetch";
 import { ChatRoom, Message } from "@/types";
+import { get } from "http";
 import { useCallback, useState } from "react";
 
-type ChatRoomInfo = {
+export type ChatRoomInfo = {
   id: number;
   created_at: string;
   updated_at: string;
@@ -13,7 +15,9 @@ type ChatRoomInfo = {
 const useChat = (id: string) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSending, setIsSending] = useState(false);
-  const [chatRoom, setChatRoom] = useState<ChatRoomInfo | null>(null);
+  const [chatRoom, setChatRoom] = useState<ChatRoomInfo | RequestError | null>(
+    null
+  );
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -23,7 +27,6 @@ const useChat = (id: string) => {
     setIsSending(true);
     try {
       let res;
-      const jwt = cookieService.get("accessToken");
 
       const formData = new FormData();
 
@@ -32,13 +35,13 @@ const useChat = (id: string) => {
         formData.append("attachment", selectedFile);
       }
 
-      res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats/${id}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: formData,
-      });
+      res = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats/${id}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (res.ok) {
         setNewMessage("");
@@ -56,19 +59,24 @@ const useChat = (id: string) => {
   };
 
   const fetchChatroom = useCallback(async () => {
-    const jwt = cookieService.get("accessToken");
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats/${id}`,
-      {
-        headers: { Authorization: `Bearer ${jwt}` },
-      }
+    const res = await authFetch(
+      `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats/${id}`
     );
     if (res.ok) {
-      const data: ChatRoom = await res.json();
-      setChatRoom(data);
-      if (data.chat_messages) {
-        setMessages(data.chat_messages);
+      try {
+        const data: ChatRoom = await res.json();
+        setChatRoom(data);
+        if (data.chat_messages) {
+          setMessages(data.chat_messages);
+        }
+      } catch (e) {
+        // handle unexpected error
+        setChatRoom(RequestErrors.unknown_error);
       }
+    } else {
+      // determinte if it's network error
+
+      setChatRoom(getErrorType(res.status, res.statusText));
     }
 
     return () => {

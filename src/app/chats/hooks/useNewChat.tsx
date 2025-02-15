@@ -3,6 +3,7 @@ import { ChatRoom, Message } from "@/types";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useChatRoomsContext } from "./useChatRoomsContext";
+import authFetch from "@/lib/fetch/fetch";
 
 export const useNewChat = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -15,8 +16,6 @@ export const useNewChat = () => {
     setIsSending(true);
 
     try {
-      const jwt = cookieService.get("accessToken");
-
       const formData = new FormData();
 
       formData.append("prompt", message);
@@ -24,13 +23,13 @@ export const useNewChat = () => {
         formData.append("attachment", selectedFile);
       }
 
-      let res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: formData,
-      });
+      let res = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (res.ok) {
         const data: ChatRoom = await res.json();
@@ -38,6 +37,7 @@ export const useNewChat = () => {
 
         // redirect to the chat room
         router.push(`/chats/${data.id}`);
+        router.refresh();
       }
     } catch (error) {
       console.error("Failed to send message:", error);

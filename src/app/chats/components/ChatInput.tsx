@@ -118,40 +118,25 @@ export default function ChatInput({
     adjustTextareaHeight(e.target);
   };
 
-  const FilePreview = () => (
-    <div className="w-full bg-gray-50 rounded-lg border">
-      <div className="relative p-2">
-        <button
-          onClick={removeAttachment}
-          className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-sm border hover:bg-gray-50 z-10"
-          type="button"
-        >
-          <X className="w-4 h-4" />
-        </button>
-        <div className="flex items-center gap-3">
-          {previewUrl ? (
-            <div className="h-12 w-12 bg-gray-100 rounded flex-shrink-0">
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="h-full w-full object-cover rounded"
-              />
-            </div>
-          ) : (
-            <div className="h-12 w-12 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center text-sm font-medium">
-              {selectedFile?.name.split(".").pop()?.toUpperCase()}
-            </div>
-          )}
-          <span className="text-sm truncate flex-1">{selectedFile?.name}</span>
-        </div>
-      </div>
-    </div>
-  );
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      if (!e.shiftKey) {
+        e.preventDefault();
+        handleFormSubmit(e);
+      }
+    }
+  };
 
   return (
     <div className="p-4 border-t">
       <form onSubmit={handleFormSubmit} className="flex flex-col gap-2">
-        {selectedFile && previewPosition === "above" && <FilePreview />}
+        {selectedFile && previewPosition === "above" && (
+          <FilePreview
+            selectedFile={selectedFile}
+            previewUrl={previewUrl}
+            removeAttachment={removeAttachment}
+          />
+        )}
 
         <div className="flex gap-2">
           <div
@@ -170,6 +155,7 @@ export default function ChatInput({
               }`}
               placeholder="Type your message..."
               disabled={isSending}
+              onKeyDown={handleKeyDown}
               rows={1}
             />
             {isDragging && (
@@ -209,8 +195,53 @@ export default function ChatInput({
           </button>
         </div>
 
-        {selectedFile && previewPosition === "below" && <FilePreview />}
+        {selectedFile && previewPosition === "below" && (
+          <FilePreview
+            selectedFile={selectedFile}
+            previewUrl={previewUrl}
+            removeAttachment={removeAttachment}
+          />
+        )}
       </form>
+    </div>
+  );
+}
+function FilePreview({
+  selectedFile,
+  previewUrl,
+  removeAttachment,
+}: {
+  selectedFile: File;
+  previewUrl: string | null;
+  removeAttachment: () => void;
+}) {
+  return (
+    <div className="w-full bg-gray-50 rounded-lg border">
+      <div className="relative p-2">
+        <button
+          onClick={removeAttachment}
+          className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-sm border hover:bg-gray-50 dark-hover:bg-gray-800 z-10"
+          type="button"
+        >
+          <X className="w-4 h-4" />
+        </button>
+        <div className="flex items-center gap-3">
+          {previewUrl ? (
+            <div className="h-12 w-12 bg-gray-100 rounded flex-shrink-0">
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="h-full w-full object-cover rounded"
+              />
+            </div>
+          ) : (
+            <div className="h-12 w-12 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center text-sm font-medium">
+              {selectedFile?.name.split(".").pop()?.toUpperCase()}
+            </div>
+          )}
+          <span className="text-sm truncate flex-1">{selectedFile?.name}</span>
+        </div>
+      </div>
     </div>
   );
 }

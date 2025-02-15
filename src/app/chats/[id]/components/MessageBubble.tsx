@@ -1,6 +1,8 @@
 import React from "react";
 import { FileText, Image, FileJson, FileCode, File } from "lucide-react";
 import { ChatAttachment, Message } from "@/types";
+import formatTimestamp from "@/lib/strings/dateFormatter";
+import HtmlPreview from "./HtmlPreview";
 
 interface MessageBubbleProps {
   message: Message;
@@ -87,9 +89,18 @@ const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
         {message.attachments?.map((attachment) => (
           <AttachmentPreview key={attachment.id} attachment={attachment} />
         ))}
-        {message.body && <p className="text-sm">{message.body}</p>}
+        {message.body && (
+          <p className="text-sm">
+            {message.body}
+            {message.body.startsWith("<!DOCTYPE html>") ? (
+              <HtmlPreview htmlString={message.body} />
+            ) : (
+              ""
+            )}
+          </p>
+        )}
         <span className="text-xs opacity-70 mt-1 block">
-          {new Date(message.created_at).toLocaleTimeString()}
+          {formatTimestamp(message.created_at)}
         </span>
       </div>
     </div>

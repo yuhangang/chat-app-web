@@ -34,6 +34,7 @@ export const useLogin = () => {
 
       if (res.ok) {
         router.replace("/chats");
+        router.refresh();
       } else {
         setError("Login failed");
       }
