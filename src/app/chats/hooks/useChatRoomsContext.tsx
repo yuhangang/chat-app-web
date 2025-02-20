@@ -49,7 +49,7 @@ const useChatRooms = () => {
 
           // TODO: Fix this
           if (pathname === `/chats/${id}`) {
-            router.replace("/chats/new");
+            router.replace("/chats");
             router.refresh();
           }
 

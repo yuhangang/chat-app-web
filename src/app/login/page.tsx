@@ -6,7 +6,12 @@ import { useRouter } from "next/navigation";
 import { useLogin } from "./hooks/useLogin";
 
 export default function LoginPage() {
-  const { username, error, setUsername, handleSubmit } = useLogin();
+  const { username, error, setUsername, login } = useLogin();
+
+  async function onClickSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await login();
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
@@ -17,7 +22,7 @@ export default function LoginPage() {
           <p className="text-gray-600 mt-2">Enter your username to continue</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={onClickSubmit} className="space-y-6">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
               {error}

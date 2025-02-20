@@ -54,12 +54,18 @@ export default function ChatsPage() {
           <button
             key={i}
             className="w-full p-4 flex items-center gap-3 text-left 
-              bg-white hover:bg-gray-50 rounded-lg shadow-sm border
-              transition-all duration-200 hover:shadow-md"
+            bg-muted hover:bg-muted/80 active:bg-muted/60
+            rounded-lg shadow-sm border border-border/50
+            transition-all duration-200
+            group"
             onClick={() => handleSuggestionClick(suggestion.text)}
           >
-            <span className="text-xl">{suggestion.icon}</span>
-            <span className="text-gray-700">{suggestion.text}</span>
+            <span className="text-xl text-muted-foreground group-hover:text-foreground transition-colors">
+              {suggestion.icon}
+            </span>
+            <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+              {suggestion.text}
+            </span>
           </button>
         ))}
       </div>

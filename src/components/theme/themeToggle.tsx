@@ -25,11 +25,14 @@ export default function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem onClick={() => setTheme(":root")}>
           Light
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
+          Dark (Warm)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark-cold")}>
+          Dark (Cold)
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
           System

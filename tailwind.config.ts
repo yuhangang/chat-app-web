@@ -50,10 +50,6 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        cardBackground: "grey-200",
-        dark: {
-          cardBackground: "grey-800",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",

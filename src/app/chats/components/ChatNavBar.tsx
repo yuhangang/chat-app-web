@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cookieService } from "@/lib/cookies";
 import { ChatRoom } from "@/types";
-import { Menu, MessageSquare, Trash2, X } from "lucide-react";
+import { Menu, MessageSquare, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useChatRoomsContext } from "../hooks/useChatRoomsContext";
 import Link from "next/link";
@@ -16,15 +16,16 @@ export function MobileNav({
 }) {
   return (
     <div className="lg:hidden">
-      {/* Hamburger menu button - fixed position */}
       <Button
-        variant="ghost"
+        variant="outline"
         size="icon"
-        className="fixed top-4 left-4 z-30 rounded-full bg-white shadow-md hover:bg-gray-100"
+        className="fixed top-4 left-4 z-30 rounded-full bg-background shadow-md 
+          hover:bg-accent hover:text-accent-foreground
+          transition-all duration-200"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle menu"
       >
-        <Menu className="h-6 w-6" />
+        <Menu className="h-5 w-5" />
       </Button>
     </div>
   );
@@ -40,30 +41,37 @@ export function ChatNavBar({ isOpen }: { isOpen: boolean }) {
   return (
     <div
       className={`
-        fixed lg:static w-64 h-full z-30 transform transition-transform
+        fixed lg:static w-72 h-full transform transition-all duration-300
+        bg-card border-r border-border/40 shadow-lg lg:shadow-none
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
     >
-      <div>
-        <div className="px-4 pt-4">
-          <Link href="/chats/new">
-            <div className="w-full bg-blue-500 text-white p-2 rounded mb-4 block text-center">
+      <div className="flex flex-col h-full">
+        <div className="p-4 border-b border-border/40">
+          <Link href="/chats?new">
+            <Button
+              className="w-full gap-2 bg-primary hover:bg-primary/90"
+              size="sm"
+            >
+              <Plus className="h-4 w-4" />
               New Chat
-            </div>
+            </Button>
           </Link>
         </div>
-        <div className="space-y-2 flex flex-col overflow-y-auto h-[calc(100vh-200px)]">
-          {chatRooms.map((room, i: number) => {
-            return (
+
+        <div className="flex-1 overflow-y-auto py-2 px-2">
+          <div className="space-y-1">
+            {chatRooms.map((room, i) => (
               <ChatRoomItem
                 key={i}
                 room={room}
                 deleteChatRoom={deleteChatRoom}
               />
-            );
-          })}
+            ))}
+          </div>
         </div>
-        <div className="fixed bottom-16 left-4">
+
+        <div className="p-4 pb-8 lg:pb-16 mt-auto">
           <ThemeToggle />
         </div>
       </div>
@@ -80,33 +88,40 @@ function ChatRoomItem({
 }) {
   return (
     <Link href={`/chats/${room.id}`}>
-      <div className="group relative flex items-center rounded hover:bg-gray-200 p-2 cursor-pointer">
-        {/* Chat Icon - Made smaller */}
-        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-2">
-          <MessageSquare size={14} />
+      <div
+        className="group relative flex items-center gap-3 p-2.5 
+        rounded-lg hover:bg-muted/80 active:bg-muted
+        transition-all duration-200 cursor-pointer"
+      >
+        <div
+          className="flex-shrink-0 w-8 h-8 rounded-full 
+          bg-primary/10 text-primary
+          flex items-center justify-center"
+        >
+          <MessageSquare className="h-4 w-4" />
         </div>
 
-        {/* Chat Name - Simplified */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-700 truncate">
+          <p className="text-sm font-medium text-foreground truncate">
             {room.name || "Unnamed Chat"}
           </p>
         </div>
 
-        {/* Delete Button */}
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              deleteChatRoom(room.id);
-            }}
-            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
-            aria-label="Delete chat room"
-          >
-            <X size={14} />
-          </button>
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="opacity-0 group-hover:opacity-100 
+            transition-opacity duration-200 h-8 w-8
+            text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            deleteChatRoom(room.id);
+          }}
+          aria-label="Delete chat room"
+        >
+          <X className="h-4 w-4" />
+        </Button>
       </div>
     </Link>
   );

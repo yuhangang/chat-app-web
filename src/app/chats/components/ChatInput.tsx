@@ -36,6 +36,7 @@ export default function ChatInput({
   const dragCounterRef = useRef(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // File handling functions remain the same
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -109,7 +110,7 @@ export default function ChatInput({
 
   const adjustTextareaHeight = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = "auto";
-    const newHeight = Math.min(textarea.scrollHeight, 5 * 24); // 24px per line, max 5 lines
+    const newHeight = Math.min(textarea.scrollHeight, 5 * 24);
     textarea.style.height = `${newHeight}px`;
   };
 
@@ -119,65 +120,59 @@ export default function ChatInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter") {
-      if (!e.shiftKey) {
-        e.preventDefault();
-        handleFormSubmit(e);
-      }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleFormSubmit(e);
     }
   };
 
   return (
-    <div className="p-4 border-t">
-      <form onSubmit={handleFormSubmit} className="flex flex-col gap-2">
-        {selectedFile && previewPosition === "above" && (
-          <FilePreview
-            selectedFile={selectedFile}
-            previewUrl={previewUrl}
-            removeAttachment={removeAttachment}
-          />
-        )}
+    <form
+      onSubmit={handleFormSubmit}
+      className="mx-auto max-w-4xl w-full rounded-xl md:rounded-2xl shadow-sm transition-all duration-200 focus-within:shadow-lg"
+    >
+      {selectedFile && previewPosition === "above" && (
+        <FilePreview
+          selectedFile={selectedFile}
+          previewUrl={previewUrl}
+          removeAttachment={removeAttachment}
+        />
+      )}
 
-        <div className="flex gap-2">
-          <div
-            className="flex-1 relative"
-            onDragEnter={handleDragEnter}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <textarea
-              ref={textareaRef}
-              value={newMessage}
-              onChange={handleTextareaChange}
-              className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[48px] transition-opacity duration-200 ${
-                isSending ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              placeholder="Type your message..."
-              disabled={isSending}
-              onKeyDown={handleKeyDown}
-              rows={1}
-            />
-            {isDragging && (
-              <div className="absolute -inset-2 border-2 border-dashed border-blue-500 bg-blue-50/80 rounded-xl flex items-center justify-center">
-                <div className="text-blue-500 text-lg font-medium">
-                  Drop file here
-                </div>
+      <div className="flex items-end gap-1 md:gap-2 p-1.5 md:p-2 bg-muted rounded-xl md:rounded-2xl border">
+        <div
+          className="flex-1 min-w-0"
+          onDragEnter={handleDragEnter}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <textarea
+            ref={textareaRef}
+            value={newMessage}
+            onChange={handleTextareaChange}
+            className={`w-full px-3 md:px-4 py-2 md:py-3 bg-transparent rounded-lg md:rounded-xl resize-none min-h-[40px] md:min-h-[48px] focus:outline-none transition-opacity duration-200 ${
+              isSending ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            placeholder="Type your message..."
+            disabled={isSending}
+            onKeyDown={handleKeyDown}
+            rows={1}
+          />
+          {isDragging && (
+            <div className="absolute inset-0 border-2 border-dashed border-blue-500 bg-blue-50/80 rounded-xl flex items-center justify-center">
+              <div className="text-blue-500 text-sm md:text-lg font-medium">
+                Drop file here
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
 
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            accept={Object.values(ALLOWED_FILE_TYPES).join(",")}
-            className="hidden"
-          />
+        <div className="flex gap-1 md:gap-2 p-0.5 md:p-1 shrink-0">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`w-12 h-12 flex items-center justify-center rounded-lg border hover:bg-gray-50 transition-all duration-200 ${
+            className={`p-2 md:p-3 rounded-lg md:rounded-xl hover:bg-gray-100 transition-all duration-200 ${
               isSending ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={isSending}
@@ -186,7 +181,7 @@ export default function ChatInput({
           </button>
           <button
             type="submit"
-            className={`w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-200 ${
+            className={`p-2 md:p-3 bg-blue-500 text-white rounded-lg md:rounded-xl hover:bg-blue-600 transition-all duration-200 ${
               isSending ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={isSending}
@@ -195,17 +190,26 @@ export default function ChatInput({
           </button>
         </div>
 
-        {selectedFile && previewPosition === "below" && (
-          <FilePreview
-            selectedFile={selectedFile}
-            previewUrl={previewUrl}
-            removeAttachment={removeAttachment}
-          />
-        )}
-      </form>
-    </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileSelect}
+          accept={Object.values(ALLOWED_FILE_TYPES).join(",")}
+          className="hidden"
+        />
+      </div>
+
+      {selectedFile && previewPosition === "below" && (
+        <FilePreview
+          selectedFile={selectedFile}
+          previewUrl={previewUrl}
+          removeAttachment={removeAttachment}
+        />
+      )}
+    </form>
   );
 }
+
 function FilePreview({
   selectedFile,
   previewUrl,
@@ -216,30 +220,32 @@ function FilePreview({
   removeAttachment: () => void;
 }) {
   return (
-    <div className="w-full bg-gray-50 rounded-lg border">
-      <div className="relative p-2">
+    <div className="mb-2">
+      <div className="relative p-2 md:p-3 bg-gray-50 rounded-lg md:rounded-xl border">
         <button
           onClick={removeAttachment}
-          className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-sm border hover:bg-gray-50 dark-hover:bg-gray-800 z-10"
+          className="absolute -top-2 -right-2 p-1 md:p-1.5 bg-white rounded-full shadow-md border hover:bg-gray-50 transition-colors duration-200"
           type="button"
         >
-          <X className="w-4 h-4" />
+          <X className="w-3 h-3 md:w-4 md:h-4" />
         </button>
         <div className="flex items-center gap-3">
           {previewUrl ? (
-            <div className="h-12 w-12 bg-gray-100 rounded flex-shrink-0">
+            <div className="h-12 w-12 md:h-14 md:w-14 bg-black rounded-lg flex-shrink-0 overflow-hidden">
               <img
                 src={previewUrl}
                 alt="Preview"
-                className="h-full w-full object-cover rounded"
+                className="h-full w-full object-cover"
               />
             </div>
           ) : (
-            <div className="h-12 w-12 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center text-sm font-medium">
+            <div className="h-12 w-12 md:h-14 md:w-14 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center text-xs md:text-sm font-medium">
               {selectedFile?.name.split(".").pop()?.toUpperCase()}
             </div>
           )}
-          <span className="text-sm truncate flex-1">{selectedFile?.name}</span>
+          <span className="text-xs md:text-sm truncate flex-1">
+            {selectedFile?.name}
+          </span>
         </div>
       </div>
     </div>

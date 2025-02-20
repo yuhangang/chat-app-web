@@ -119,11 +119,7 @@ export const authCookieService = {
 
         console.log("Access token refreshed");
       } else {
-        console.log(
-          "Failed to refresh access token",
-          result.status,
-          refreshToken
-        );
+        console.log("Failed to refresh access token");
       }
     }
   },

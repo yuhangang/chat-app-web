@@ -1,11 +1,29 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { use, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { use } from "react";
 import ChatInput from "../components/ChatInput";
 import MessageBubble from "./components/MessageBubble";
 import useChat, { ChatRoomInfo } from "./hooks/useChat";
-import { ChatRoom, RequestError } from "@/types";
+import { ChatRoom, Message, RequestError } from "@/types";
+import { ChatContent, ChatRoomLayout } from "../components/ChatRoomContent";
+
+// Loading state component
+function LoadingState() {
+  return <ChatRoomLayout title="Loading..."></ChatRoomLayout>;
+}
+
+// Error state component
+function ErrorState({ message }: { message: string }) {
+  return (
+    <ChatRoomLayout title="Error">
+      <div className="p-4">
+        <p>{message}</p>
+      </div>
+    </ChatRoomLayout>
+  );
+}
 
 export default function ChatRoomPage({
   params,
@@ -27,7 +45,7 @@ export default function ChatRoomPage({
   } = useChat(id);
 
   const scrollToBottom = () => {
-    messagesStartRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesStartRef.current?.scrollIntoView();
   };
 
   useEffect(() => {
@@ -44,62 +62,28 @@ export default function ChatRoomPage({
     sendMessage(e);
   };
 
+  // Handle different states
   if (chatRoom === null) {
-    return (
-      <Card className="max-w-4xl mx-auto h-[90vh] flex flex-col">
-        <CardHeader className="border-b">
-          <CardTitle className="text-xl font-semibold">Loading...</CardTitle>
-        </CardHeader>
-      </Card>
-    );
-  } else if ("message" in chatRoom) {
-    const error: RequestError = chatRoom;
-
-    return (
-      <Card className="max-w-4xl mx-auto h-[90vh] flex flex-col">
-        <CardHeader className="border-b">
-          <CardTitle className="text-xl font-semibold">Error</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>{chatRoom.message}</p>
-        </CardContent>
-      </Card>
-    );
-  } else {
-    const chatRoomInfo: ChatRoomInfo = chatRoom;
-
-    return (
-      <Card className="max-w-4xl mx-auto h-[90vh] flex flex-col">
-        <CardHeader className="border-b">
-          <CardTitle className="text-xl font-semibold">
-            {chatRoom?.name ?? ""}
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent className="flex-1 overflow-hidden flex flex-col p-0">
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col-reverse">
-            <div ref={messagesStartRef} />
-            {messages
-              .slice()
-              .reverse()
-              .map((message) => (
-                <MessageBubble
-                  key={message.id}
-                  message={message}
-                  isOwn={message.is_user}
-                />
-              ))}
-          </div>
-          <ChatInput
-            isSending={isSending}
-            handleSubmit={handleSubmit}
-            newMessage={newMessage}
-            setNewMessage={setNewMessage}
-            selectedFile={selectedFile}
-            setSelectedFile={setSelectedFile}
-          />
-        </CardContent>
-      </Card>
-    );
+    return <LoadingState />;
   }
+
+  if ("message" in chatRoom) {
+    const error = chatRoom as RequestError;
+    return <ErrorState message={error.message} />;
+  }
+
+  const chatRoomInfo = chatRoom as ChatRoomInfo;
+  return (
+    <ChatContent
+      title={chatRoomInfo.name}
+      messages={messages}
+      messagesStartRef={messagesStartRef}
+      isSending={isSending}
+      handleSubmit={handleSubmit}
+      newMessage={newMessage}
+      setNewMessage={setNewMessage}
+      selectedFile={selectedFile}
+      setSelectedFile={setSelectedFile}
+    />
+  );
 }

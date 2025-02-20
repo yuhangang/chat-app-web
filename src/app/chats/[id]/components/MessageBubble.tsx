@@ -80,7 +80,7 @@ const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
         className={`
           ${
             isOwn
-              ? "bg-blue-500 text-white ml-auto"
+              ? "bg-primary text-white ml-auto"
               : "bg-cardBackground mr-auto"
           }
           max-w-[70%] rounded-lg p-3

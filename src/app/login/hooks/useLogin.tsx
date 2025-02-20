@@ -1,38 +1,22 @@
+import { loginUser } from "@/app/api/auth/authServices";
 import { authCookieService } from "@/lib/cookies";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-type AuthResponse = {
-  access_token: string;
-  refresh_token: string;
-};
 
 export const useLogin = () => {
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const login = async () => {
     setError("");
 
     try {
       // api end point from env API_ENDPOINT
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-      });
+      const success = await loginUser({ username });
 
-      const data: AuthResponse | null = await res.json();
-
-      if (data) {
-        authCookieService.setAccessToken(data.access_token);
-        authCookieService.setRefreshToken(data.refresh_token);
-      }
-
-      if (res.ok) {
+      if (success) {
         router.replace("/chats");
         router.refresh();
       } else {
@@ -44,5 +28,5 @@ export const useLogin = () => {
     }
   };
 
-  return { username, error, setUsername, handleSubmit };
+  return { username, error, setUsername, login };
 };
