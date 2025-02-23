@@ -1,30 +1,45 @@
-// src/app/login/page.tsx
 "use client";
+
+import React, { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useLogin } from "./hooks/useLogin";
+import { sign } from "crypto";
 
-export default function LoginPage() {
-  const { username, error, setUsername, login } = useLogin();
+const AuthPage = () => {
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [username, setUsername] = useState("");
+  const [error, setError] = useState("");
+  const { login, signUp } = useLogin();
 
-  async function onClickSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await login();
-  }
+    setError("");
 
+    if (isLoginMode) {
+      await login();
+    } else {
+      await signUp();
+    }
+  }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="w-full max-w-md bg-card p-8 rounded-lg shadow-lg">
         <div className="text-center mb-8">
-          <MessageCircle className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-gray-800">Welcome Back</h1>
-          <p className="text-gray-600 mt-2">Enter your username to continue</p>
+          <MessageCircle className="w-12 h-12 text-primary mx-auto mb-4" />
+          <h1 className="text-3xl font-bold text-foreground">
+            {isLoginMode ? "Welcome Back" : "Create Account"}
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            {isLoginMode
+              ? "Enter your username to continue"
+              : "Choose a username to get started"}
+          </p>
         </div>
 
-        <form onSubmit={onClickSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+            <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-lg relative">
               {error}
             </div>
           )}
@@ -32,7 +47,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium text-foreground mb-2"
             >
               Username
             </label>
@@ -42,28 +57,39 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your username"
+              className="w-full px-3 py-2 bg-background border border-input rounded-lg shadow-sm 
+                focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
+                text-foreground placeholder:text-muted-foreground"
+              placeholder={
+                isLoginMode ? "Enter your username" : "Choose a username"
+              }
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition font-semibold"
+            className="w-full bg-primary text-primary-foreground py-3 rounded-lg 
+              hover:bg-primary/90 transition duration-200 font-semibold
+              focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
-            Continue
+            {isLoginMode ? "Continue" : "Create Account"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            New to ChatApp?{" "}
-            <Link href="/signup" className="text-blue-600 hover:underline">
-              Create an account
-            </Link>
-          </p>
+          <button
+            onClick={() => setIsLoginMode(!isLoginMode)}
+            className="text-primary hover:text-primary/90 hover:underline text-sm
+              focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg px-2 py-1"
+          >
+            {isLoginMode
+              ? "New to ChatApp? Create an account"
+              : "Already have an account? Log in"}
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default AuthPage;

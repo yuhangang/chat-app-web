@@ -5,7 +5,7 @@ import { cookieService } from "@/lib/cookies";
 import { ChatRoom } from "@/types";
 import { Link, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ChatNavBar, MobileNav } from "./components/ChatNavBar";
+import { ChatNavBar, MobileNav } from "./components/ChatNavBar/ChatNavBar";
 import { ChatRoomsProvider } from "./hooks/useChatRoomsContext";
 
 export default function Layout({
