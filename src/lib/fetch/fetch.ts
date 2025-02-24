@@ -9,11 +9,11 @@ export default async function authFetch(
     await authCookieService.refetchToken();
   }
 
-  var accessToken = authCookieService.getAccessToken();
+  let accessToken = authCookieService.getAccessToken();
 
   if (!accessToken) {
     console.log("No access token found, logging in...");
-    let res = await loginUser({ username: null });
+    const res = await loginUser({ username: null });
 
     if (res) {
       accessToken = authCookieService.getAccessToken();

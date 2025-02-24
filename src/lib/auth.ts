@@ -16,7 +16,7 @@ export async function verifyAuth() {
   try {
     const verified = await jwtVerify(token.value, JWT_SECRET);
     return verified.payload;
-  } catch (err) {
+  } catch {
     throw new Error("Unauthorized");
   }
 }

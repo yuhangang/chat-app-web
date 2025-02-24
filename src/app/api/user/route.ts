@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     const userData = await backendResponse.json();
 
-    let cookiesInstance = await cookies();
+    const cookiesInstance = await cookies();
 
     // Set the JWT from backend response
     await cookiesInstance.set("accessToken", userData.access_token, {
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(userData);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to create user" },
       { status: 500 }

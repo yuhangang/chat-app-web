@@ -8,9 +8,9 @@ type AuthResponse = {
 export async function loginUser({
   username,
 }: {
-  username?: String | null;
+  username?: string | null;
 }): Promise<boolean> {
-  let accessToken = authCookieService.getAccessToken();
+  const accessToken = authCookieService.getAccessToken();
   console.log("accessToken", accessToken);
 
   const formData = new FormData();
@@ -47,9 +47,9 @@ export async function loginUser({
 export async function createAccount({
   username,
 }: {
-  username?: String | null;
+  username?: string | null;
 }): Promise<boolean> {
-  let accessToken = authCookieService.getAccessToken();
+  const accessToken = authCookieService.getAccessToken();
   console.log("accessToken", accessToken);
 
   const formData = new FormData();

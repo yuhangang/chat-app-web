@@ -63,7 +63,7 @@ const useChatRooms = () => {
         return false;
       }
     },
-    [fetchChatRooms, usePathname]
+    [pathname, router]
   );
 
   return {

@@ -1,10 +1,7 @@
 import { Message } from "@/types";
 import MessageBubble from "../[id]/components/MessageBubble";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ChatInput from "./ChatInput";
-import { MenuIcon, Home, Settings, LogOut, LogIn } from "lucide-react";
-import Link from "next/link";
 import { ChatHeader } from "./ChatHeader";
+import ChatInput from "./ChatInput";
 
 // Chat content component
 export function ChatContent({
@@ -33,9 +30,9 @@ export function ChatContent({
       <ChatHeader title={title} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto w-full px-4">
+          <div className="max-w-4xl mx-auto w-full px-4 py-8">
             <div className="flex-1 flex flex-col-reverse">
-              <div ref={messagesStartRef} className="pb-16" />
+              <div ref={messagesStartRef} />
               {messages
                 .slice()
                 .reverse()

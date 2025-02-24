@@ -1,4 +1,4 @@
-import { LogIn, MenuIcon } from "lucide-react";
+import { LogIn } from "lucide-react";
 import Link from "next/link";
 
 // Navigation component

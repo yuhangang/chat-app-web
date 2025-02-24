@@ -1,11 +1,8 @@
 "use client";
-import { Input } from "@/components/ui/input";
-import { Loader2, SendIcon, Sparkles } from "lucide-react";
-import React, { useState } from "react";
-import { useChatRoomsContext } from "./hooks/useChatRoomsContext";
-import { useNewChat } from "./hooks/useNewChat";
-import ChatInput from "./components/ChatInput";
+import React from "react";
 import { ChatHeader } from "./components/ChatHeader";
+import ChatInput from "./components/ChatInput";
+import { useNewChat } from "./hooks/useNewChat";
 
 export default function ChatsPage() {
   const suggestions = [
@@ -73,15 +70,6 @@ export default function ChatsPage() {
             </button>
           ))}
         </div>
-
-        {isSending && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
-            <div className="bg-white p-6 rounded-xl shadow-xl flex items-center gap-4 animate-in fade-in duration-300">
-              <Sparkles className="h-5 w-5 text-blue-500 animate-pulse" />
-              <p className="text-sm font-medium">Creating your chat room...</p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

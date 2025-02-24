@@ -1,7 +1,6 @@
 import { getErrorType, RequestError, RequestErrors } from "@/lib/error";
 import authFetch from "@/lib/fetch/fetch";
 import { ChatRoom, Message } from "@/types";
-import { get } from "http";
 import { useCallback, useState } from "react";
 
 export type ChatRoomInfo = {
@@ -26,8 +25,6 @@ const useChat = (id: string) => {
 
     setIsSending(true);
     try {
-      let res;
-
       const formData = new FormData();
 
       formData.append("prompt", newMessage);
@@ -35,7 +32,7 @@ const useChat = (id: string) => {
         formData.append("attachment", selectedFile);
       }
 
-      res = await authFetch(
+      const res = await authFetch(
         `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats/${id}`,
         {
           method: "POST",
@@ -69,7 +66,7 @@ const useChat = (id: string) => {
         if (data.chat_messages) {
           setMessages(data.chat_messages);
         }
-      } catch (e) {
+      } catch {
         // handle unexpected error
         setChatRoom(RequestErrors.unknown_error);
       }

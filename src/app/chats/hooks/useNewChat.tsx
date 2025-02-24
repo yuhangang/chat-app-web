@@ -1,9 +1,8 @@
-import { cookieService } from "@/lib/cookies";
-import { ChatRoom, Message } from "@/types";
-import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-import { useChatRoomsContext } from "./useChatRoomsContext";
 import authFetch from "@/lib/fetch/fetch";
+import { ChatRoom } from "@/types";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useChatRoomsContext } from "./useChatRoomsContext";
 
 export const useNewChat = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -23,7 +22,7 @@ export const useNewChat = () => {
         formData.append("attachment", selectedFile);
       }
 
-      let res = await authFetch(
+      const res = await authFetch(
         `${process.env.NEXT_PUBLIC_API_ENDPOINT}/chats`,
         {
           method: "POST",

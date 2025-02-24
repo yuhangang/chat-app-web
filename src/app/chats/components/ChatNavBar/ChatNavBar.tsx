@@ -14,9 +14,8 @@ export function MobileNav({
   return (
     <div className="lg:hidden">
       <Button
-        variant="outline"
         size="icon"
-        className="fixed top-4 left-4 z-30 rounded-full bg-background shadow-md 
+        className="fixed top-3 left-4 z-30 bg-background shadow-md 
           hover:bg-accent hover:text-accent-foreground
           transition-all duration-200"
         onClick={() => setIsOpen(!isOpen)}

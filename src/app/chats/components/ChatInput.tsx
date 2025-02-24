@@ -1,5 +1,6 @@
+import { Paperclip, Send, X } from "lucide-react";
 import React, { useRef, useState } from "react";
-import { Send, Paperclip, X } from "lucide-react";
+import Image from "next/image";
 
 const ALLOWED_FILE_TYPES = {
   "text/plain": ".txt",
@@ -19,8 +20,8 @@ export default function ChatInput({
   setNewMessage,
   setSelectedFile,
   previewPosition = "above",
-  previewMaxHeight = "12rem",
-}: {
+}: // previewMaxHeight = "12rem",
+{
   isSending: boolean;
   newMessage: string;
   selectedFile: File | null;
@@ -28,7 +29,7 @@ export default function ChatInput({
   setNewMessage: (message: string) => void;
   setSelectedFile: (file: File | null) => void;
   previewPosition?: "above" | "below";
-  previewMaxHeight?: string;
+  // previewMaxHeight?: string;
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -232,7 +233,7 @@ function FilePreview({
         <div className="flex items-center gap-3">
           {previewUrl ? (
             <div className="h-12 w-12 md:h-14 md:w-14 bg-black rounded-lg flex-shrink-0 overflow-hidden">
-              <img
+              <Image
                 src={previewUrl}
                 alt="Preview"
                 className="h-full w-full object-cover"

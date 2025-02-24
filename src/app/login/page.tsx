@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
 import { MessageCircle } from "lucide-react";
-import Link from "next/link";
+import React, { useState } from "react";
 import { useLogin } from "./hooks/useLogin";
-import { sign } from "crypto";
 
 const AuthPage = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);

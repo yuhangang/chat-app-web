@@ -1,9 +1,8 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { ChatRoom } from "@/types";
 import { MessageSquare, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useChatRoomsContext } from "../../../hooks/useChatRoomsContext";
 import groupRoomsByDate, { GroupedRooms } from "./lib/ChatNavBarRoomsSorter";
 
@@ -12,7 +11,7 @@ const ChatNavBarRoomsList = () => {
 
   useEffect(() => {
     fetchChatRooms();
-  }, []);
+  });
 
   const [groupedRooms, setGroupedRooms] = React.useState<GroupedRooms>({
     today: [],

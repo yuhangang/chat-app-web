@@ -1,13 +1,9 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useRef } from "react";
-import { use } from "react";
-import ChatInput from "../components/ChatInput";
-import MessageBubble from "./components/MessageBubble";
-import useChat, { ChatRoomInfo } from "./hooks/useChat";
-import { ChatRoom, Message, RequestError } from "@/types";
+import { RequestError } from "@/types";
+import { use, useEffect, useRef } from "react";
 import { ChatContent, ChatRoomLayout } from "../components/ChatRoomContent";
+import useChat, { ChatRoomInfo } from "./hooks/useChat";
 
 // Loading state component
 function LoadingState() {
@@ -50,7 +46,7 @@ export default function ChatRoomPage({
 
   useEffect(() => {
     fetchChatroom();
-  }, []);
+  });
 
   useEffect(() => {
     scrollToBottom();

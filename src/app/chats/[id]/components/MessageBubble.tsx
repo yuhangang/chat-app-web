@@ -1,8 +1,9 @@
-import React from "react";
-import { FileText, Image, FileJson, FileCode, File } from "lucide-react";
-import { ChatAttachment, Message } from "@/types";
 import formatTimestamp from "@/lib/strings/dateFormatter";
+import { ChatAttachment, Message } from "@/types";
+import { File, FileCode, FileJson, FileText } from "lucide-react";
 import HtmlPreview from "./HtmlPreview";
+import MarkdownViewer from "./MarkdownViewer";
+import Image from "next/image";
 
 interface MessageBubbleProps {
   message: Message;
@@ -41,7 +42,7 @@ const AttachmentPreview = ({ attachment }: { attachment: ChatAttachment }) => {
     return (
       <div className="mb-2">
         <a href={attachment.file_path} target="_blank">
-          <img
+          <Image
             src={attachment.file_path}
             alt={attachment.file_name}
             className="w-40 h-40 rounded-lg object-cover aspect-[1]"
@@ -80,10 +81,10 @@ const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
         className={`
           ${
             isOwn
-              ? "bg-primary text-white ml-auto"
-              : "bg-cardBackground mr-auto"
+              ? "bg-primary text-white ml-auto min-w-[60%]"
+              : "bg-secondary mr-auto    w-100"
           }
-          max-w-[70%] rounded-lg p-3
+       rounded-lg p-4 break-words
         `}
       >
         {message.attachments?.map((attachment) => (
@@ -91,7 +92,7 @@ const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
         ))}
         {message.body && (
           <p className="text-sm">
-            {message.body}
+            <MarkdownViewer markdown={message.body} />
             {message.body.startsWith("<!DOCTYPE html>") ? (
               <HtmlPreview htmlString={message.body} />
             ) : (
@@ -99,7 +100,7 @@ const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
             )}
           </p>
         )}
-        <span className="text-xs opacity-70 mt-1 block">
+        <span className="text-xs opacity-70 mt-1 block text-right pt-4">
           {formatTimestamp(message.created_at)}
         </span>
       </div>
