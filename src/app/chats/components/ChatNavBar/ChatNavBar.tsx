@@ -27,18 +27,27 @@ export function MobileNav({
   );
 }
 
-export function ChatNavBar({ isOpen }: { isOpen: boolean }) {
+export function ChatNavBar({
+  isOpen,
+  closeMobileNav,
+}: {
+  isOpen: boolean;
+  closeMobileNav: () => void;
+}) {
   return (
     <div
       className={`
-        fixed lg:static w-72 h-full transform transition-all duration-300
+        fixed lg:static w-80 h-full transform transition-all duration-300
         bg-card border-r border-border/40 shadow-lg lg:shadow-none
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
     >
       <div className="flex flex-col h-full">
         <div className="p-4 border-b border-border/40">
-          <Link href="/chats?new">
+          <Link
+            href="/chats?new"
+            onClickCapture={() => isOpen && closeMobileNav()}
+          >
             <Button
               className="w-full gap-2 bg-primary hover:bg-primary/90"
               size="sm"
@@ -49,7 +58,9 @@ export function ChatNavBar({ isOpen }: { isOpen: boolean }) {
           </Link>
         </div>
 
-        <ChatNavBarRoomsList />
+        <ChatNavBarRoomsList
+          closeMobileNav={() => isOpen && closeMobileNav()}
+        />
 
         <div className="p-4 pb-8 lg:pb-16 mt-auto">
           <ThemeToggle />

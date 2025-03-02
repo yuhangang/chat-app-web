@@ -34,7 +34,10 @@ export default function Layout({
                         ${isOpen ? "translate-x-0" : "-translate-x-full"}
                     `}
           >
-            <ChatNavBar isOpen={isOpen} />
+            <ChatNavBar
+              isOpen={isOpen}
+              closeMobileNav={() => setIsOpen(false)}
+            />
           </div>
 
           {/* Main content */}

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { ChatHeader } from "./components/ChatHeader";
-import ChatInput from "./components/ChatInput";
+import ChatInput from "./components/ChatInput/ChatInput";
 import { useNewChat } from "./hooks/useNewChat";
 
 export default function ChatsPage() {
@@ -21,7 +21,7 @@ export default function ChatsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() && !selectedFile) return;
     sendMessage(newMessage);
   };
 

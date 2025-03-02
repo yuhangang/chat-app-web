@@ -1,7 +1,7 @@
 import { Message } from "@/types";
 import MessageBubble from "../[id]/components/MessageBubble";
 import { ChatHeader } from "./ChatHeader";
-import ChatInput from "./ChatInput";
+import ChatInput from "./ChatInput/ChatInput";
 
 // Chat content component
 export function ChatContent({

@@ -6,12 +6,16 @@ import React, { useEffect } from "react";
 import { useChatRoomsContext } from "../../../hooks/useChatRoomsContext";
 import groupRoomsByDate, { GroupedRooms } from "./lib/ChatNavBarRoomsSorter";
 
-const ChatNavBarRoomsList = () => {
+const ChatNavBarRoomsList = ({
+  closeMobileNav,
+}: {
+  closeMobileNav: () => void;
+}) => {
   const { chatRooms, fetchChatRooms, deleteChatRoom } = useChatRoomsContext();
 
   useEffect(() => {
     fetchChatRooms();
-  });
+  }, [fetchChatRooms]);
 
   const [groupedRooms, setGroupedRooms] = React.useState<GroupedRooms>({
     today: [],
@@ -31,6 +35,7 @@ const ChatNavBarRoomsList = () => {
           title="Today"
           rooms={groupedRooms.today}
           deleteChatRoom={deleteChatRoom}
+          closeNavBar={closeMobileNav}
         />
       )}
 
@@ -39,6 +44,7 @@ const ChatNavBarRoomsList = () => {
           title="Last 7 Days"
           rooms={groupedRooms.last7days}
           deleteChatRoom={deleteChatRoom}
+          closeNavBar={closeMobileNav}
         />
       )}
 
@@ -47,6 +53,7 @@ const ChatNavBarRoomsList = () => {
           title="Last 30 Days"
           rooms={groupedRooms.last30days}
           deleteChatRoom={deleteChatRoom}
+          closeNavBar={closeMobileNav}
         />
       )}
 
@@ -55,6 +62,7 @@ const ChatNavBarRoomsList = () => {
           title="Older"
           rooms={groupedRooms.older}
           deleteChatRoom={deleteChatRoom}
+          closeNavBar={closeMobileNav}
         />
       )}
     </div>
@@ -65,10 +73,12 @@ const RoomGroup = ({
   title,
   rooms,
   deleteChatRoom,
+  closeNavBar,
 }: {
   title: string;
   rooms: ChatRoom[];
   deleteChatRoom: (id: number) => Promise<boolean>;
+  closeNavBar: () => void;
 }) => {
   return (
     <div className="space-y-1">
@@ -80,6 +90,7 @@ const RoomGroup = ({
           key={room.id}
           room={room}
           deleteChatRoom={deleteChatRoom}
+          closeNavBar={closeNavBar}
         />
       ))}
     </div>
@@ -89,12 +100,14 @@ const RoomGroup = ({
 const ChatRoomItem = ({
   room,
   deleteChatRoom,
+  closeNavBar,
 }: {
   room: ChatRoom;
   deleteChatRoom: (id: number) => Promise<boolean>;
+  closeNavBar: () => void;
 }) => {
   return (
-    <Link href={`/chats/${room.id}`}>
+    <Link href={`/chats/${room.id}`} onClickCapture={() => closeNavBar()}>
       <div
         className="group relative flex items-center gap-3 p-2.5 
           rounded-lg hover:bg-muted/80 active:bg-muted

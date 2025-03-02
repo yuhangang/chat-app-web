@@ -11,7 +11,6 @@ export async function loginUser({
   username?: string | null;
 }): Promise<boolean> {
   const accessToken = authCookieService.getAccessToken();
-  console.log("accessToken", accessToken);
 
   const formData = new FormData();
 
@@ -20,7 +19,7 @@ export async function loginUser({
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/login"`,
+    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/login`,
     {
       method: "POST",
       headers: {
@@ -58,16 +57,13 @@ export async function createAccount({
     formData.append("username", username as string);
   }
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/bind-user"`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: formData,
-    }
-  );
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: formData,
+  });
 
   if (res.ok) {
     const data: AuthResponse | null = await res.json();

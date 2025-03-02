@@ -41,12 +41,11 @@ const useChat = (id: string) => {
       );
 
       if (res.ok) {
-        setNewMessage("");
-        setSelectedFile(null);
-
         const data: Message[] = await res.json();
 
         setMessages((prev) => [...prev, ...data]);
+        setNewMessage("");
+        setSelectedFile(null);
       }
     } catch (error) {
       console.error("Failed to send message:", error);
