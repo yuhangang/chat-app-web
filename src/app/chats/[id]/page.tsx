@@ -3,7 +3,7 @@
 import { RequestError } from "@/types";
 import { use, useEffect, useRef } from "react";
 import { ChatContent, ChatRoomLayout } from "../components/ChatRoomContent";
-import useChat, { ChatRoomInfo } from "./hooks/useChat";
+import useChat, { ChatProvider, ChatRoomInfo } from "./hooks/useChat";
 
 // Loading state component
 function LoadingState() {
@@ -27,18 +27,26 @@ export default function ChatRoomPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+
+  if (!id) {
+    return <LoadingState />;
+  }
+
+  return (
+    <ChatProvider id={id}>
+      <ChatRoomPageBody />
+    </ChatProvider>
+  );
+}
+
+function ChatRoomPageBody() {
   const messagesStartRef = useRef<HTMLDivElement>(null);
   const {
     chatRoom,
     messages,
-    isSending,
-    newMessage,
-    selectedFile,
-    setNewMessage,
-    sendMessage,
-    setSelectedFile,
-    fetchChatrooms: fetchChatroom,
-  } = useChat(id);
+
+    fetchChatroom: fetchChatroom,
+  } = useChat();
 
   const scrollToBottom = () => {
     messagesStartRef.current?.scrollIntoView();
@@ -51,12 +59,6 @@ export default function ChatRoomPage({
   useEffect(() => {
     scrollToBottom();
   }, [messages.length]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-    sendMessage(e);
-  };
 
   // Handle different states
   if (chatRoom === null) {
@@ -74,12 +76,6 @@ export default function ChatRoomPage({
       title={chatRoomInfo.name}
       messages={messages}
       messagesStartRef={messagesStartRef}
-      isSending={isSending}
-      handleSubmit={handleSubmit}
-      newMessage={newMessage}
-      setNewMessage={setNewMessage}
-      selectedFile={selectedFile}
-      setSelectedFile={setSelectedFile}
     />
   );
 }

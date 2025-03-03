@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import { ChatSettingsPanel } from "./ChatSettingsPanel";
 import DragFileOverlay from "./DragFileOverlay";
 import FilePreview from "./FilePreview";
+import { useChatAdapter } from "./hooks/ChatInputAdapter";
 
 // TODO: handle models config from the backend
 export const MODEL_OPTIONS = [
@@ -24,25 +25,27 @@ const ALLOWED_FILE_TYPES = {
 };
 
 export default function ChatInput({
-  isSending,
-  newMessage,
-  selectedFile,
-  handleSubmit,
-  setNewMessage,
-  setSelectedFile,
   previewPosition = "above",
+  chatInputType,
 }: {
-  isSending: boolean;
-  newMessage: string;
-  selectedFile: File | null;
-  handleSubmit: (
-    e: React.FormEvent,
-    options?: { attachment?: File; model?: string; temperature?: number }
-  ) => void;
-  setNewMessage: (message: string) => void;
-  setSelectedFile: (file: File | null) => void;
   previewPosition?: "above" | "below";
+  chatInputType: "chat" | "newChat";
 }) {
+  const {
+    isSending,
+    newMessage,
+    selectedFile,
+    setNewMessage,
+    setSelectedFile,
+    sendMessage,
+  } = useChatAdapter(chatInputType);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+    sendMessage("");
+  };
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -112,11 +115,7 @@ export default function ChatInput({
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
-    handleSubmit(e, {
-      attachment: selectedFile || undefined,
-      model: selectedModel.id,
-      temperature: temperature,
-    });
+    handleSubmit(e);
     removeAttachment();
   };
 

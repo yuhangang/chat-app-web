@@ -1,7 +1,13 @@
 import { getErrorType, RequestError, RequestErrors } from "@/lib/error";
 import authFetch from "@/lib/fetch/fetch";
 import { ChatRoom, Message } from "@/types";
-import { useCallback, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useState,
+  useContext,
+  ReactNode,
+} from "react";
 
 export type ChatRoomInfo = {
   id: number;
@@ -11,7 +17,26 @@ export type ChatRoomInfo = {
   user_id: number;
 };
 
-const useChat = (id: string) => {
+interface ChatContextType {
+  chatRoom: ChatRoomInfo | RequestError | null;
+  messages: Message[];
+  newMessage: string;
+  isSending: boolean;
+  selectedFile: File | null;
+  setSelectedFile: (file: File | null) => void;
+  setNewMessage: (message: string) => void;
+  sendMessage: () => Promise<void>;
+  fetchChatroom: () => Promise<void>;
+}
+
+interface ChatProviderProps {
+  id: string;
+  children: ReactNode;
+}
+
+const ChatContext = createContext<ChatContextType | undefined>(undefined);
+
+export const ChatProvider = ({ id, children }: ChatProviderProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSending, setIsSending] = useState(false);
   const [chatRoom, setChatRoom] = useState<ChatRoomInfo | RequestError | null>(
@@ -20,9 +45,7 @@ const useChat = (id: string) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const sendMessage = async () => {
     setIsSending(true);
     try {
       const formData = new FormData();
@@ -70,17 +93,12 @@ const useChat = (id: string) => {
         setChatRoom(RequestErrors.unknown_error);
       }
     } else {
-      // determinte if it's network error
-
+      // determine if it's network error
       setChatRoom(getErrorType(res.status, res.statusText));
     }
-
-    return () => {
-      // Cleanup
-    };
   }, [id]);
 
-  return {
+  const value = {
     chatRoom,
     messages,
     newMessage,
@@ -89,8 +107,18 @@ const useChat = (id: string) => {
     setSelectedFile,
     setNewMessage,
     sendMessage,
-    fetchChatrooms: fetchChatroom,
+    fetchChatroom,
   };
+
+  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
+};
+
+export const useChat = () => {
+  const context = useContext(ChatContext);
+  if (context === undefined) {
+    throw new Error("useChat must be used within a ChatProvider");
+  }
+  return context;
 };
 
 export default useChat;

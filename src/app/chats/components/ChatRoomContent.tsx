@@ -8,22 +8,10 @@ export function ChatContent({
   title,
   messages,
   messagesStartRef,
-  isSending,
-  handleSubmit,
-  newMessage,
-  setNewMessage,
-  selectedFile,
-  setSelectedFile,
 }: {
   title: string;
   messages: Message[];
   messagesStartRef: React.RefObject<HTMLDivElement | null> | null;
-  isSending: boolean;
-  handleSubmit: (e: React.FormEvent) => void;
-  newMessage: string;
-  setNewMessage: (message: string) => void;
-  selectedFile: File | null;
-  setSelectedFile: (file: File | null) => void;
 }) {
   return (
     <div className="h-screen flex flex-col">
@@ -49,14 +37,7 @@ export function ChatContent({
 
         <div className="border-t bg-background">
           <div className="max-w-4xl mx-auto w-full px-4 py-3">
-            <ChatInput
-              isSending={isSending}
-              handleSubmit={handleSubmit}
-              newMessage={newMessage}
-              setNewMessage={setNewMessage}
-              selectedFile={selectedFile}
-              setSelectedFile={setSelectedFile}
-            />
+            <ChatInput chatInputType="chat" />
           </div>
         </div>
       </div>
