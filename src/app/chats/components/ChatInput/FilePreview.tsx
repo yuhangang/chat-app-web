@@ -23,11 +23,13 @@ export default function FilePreview({
           </button>
           <div className="flex items-center gap-3">
             {previewUrl ? (
-              <div className="h-12 w-12 md:h-14 md:w-14 bg-black rounded-lg flex-shrink-0 overflow-hidden">
+              <div className="h-12 w-12 md:h-14 md:w-14 bg-black rounded-lg flex-shrink-0 overflow-hidden relative">
                 <Image
                   src={previewUrl}
                   alt="Preview"
-                  className="h-full w-full object-cover"
+                  width={56}
+                  height={56}
+                  className="object-cover"
                 />
               </div>
             ) : (
